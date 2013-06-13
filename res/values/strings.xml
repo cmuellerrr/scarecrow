@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Control Panel -->
+	<string name="app_name">Control Panel V1</string>
+    <string name="Frequency">Frequency</string>
+    <string name="Contrast">Contrast</string>
+    <string name="LineDensity">Line Density</string>
+    <string name="SRI">SRI:</string>
+    
+    <string-array name="Frequency_Vals">
+        <item>2.0</item>
+        <item>2.5</item>
+        <item>3.5</item>
+        <item>5.0</item>
+    </string-array>
+    <string-array name="LMH">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+        
+    <!-- Bottom Panel -->
+    <string name="B_Mode">B</string>
+    <string name="Gain">Gain</string>
+    <string name="Angle">Angle</string>
+    
+    
+    <!-- Menu Bar -->
+    <string name="app_url">http://www.sasethealthcare.com</string>
+        
+
+   
+	<!--  Pages -->
+    <string name="Probe_Settings">Probe Settings</string>
+    
+    <!-- Connection PopUp -->
+    <string name="Connection_Settings">Saset Connection Settings</string>
+    <string name="Status">Status:</string>
+    <string name="Connect">Connect</string>
+    <string name="Connected">Connected</string>
+    <string name="NotConnected">Not Connected</string>
+    <string name="Back">Back</string>
+    <string name="Connect_Msg1">Please enter your Saset system\'s local IP address.</string>
+    <string name="Connect_Msg2">Connection failed.\nCheck your Internet connection or IP address.</string>
+    <string name="Connect_Msg3">Your Android device has been disconnected from your Saset system.</string>
+    <string name="Connect_Msg4">You are successfully connected.</string>
+    <string name="IP_Address">IP Address:</string>
+    
+    <string name="menu_settings">menu</string>
+    
+    
+</resources>
