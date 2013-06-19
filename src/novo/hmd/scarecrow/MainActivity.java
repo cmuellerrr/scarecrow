@@ -35,7 +35,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 public class MainActivity extends Activity {
-
+	
 	private DataUpdateReceiver dataUpdateReceiver;
 	private static final String TAG = "MainActivity_Server";	// used for logging purposes
 	
@@ -52,7 +52,6 @@ public class MainActivity extends Activity {
 	//image view for prototyping
 	ImageView imageView;
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,22 +59,19 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.control_panel);
         Log.v(TAG, "onCreate");
         
-        // to view variables stored in MainApp
+        // to access MainApp
         MainApp = (MainApp) MainActivity.this.getApplication();   
 
-        // to begin ConnectionService (connection to ultrasound system)
+        // to begin ConnectionService
        	if (!isMyServiceRunning())
        		startService(new Intent(MainActivity.this,ConnectionService.class));
        	doBindService();
-
 		
-       	// stores data on android tablet (in this case, we are storing the IP address of ultrasound system for future use)
-
-
+       	// initializes imageView so it is accessible
         imageView = (ImageView) findViewById(R.id.imageView);
+        
+        // checks SD card
         checkExternalStorage();
-        
-        
 	}
 	
     // The activity is about to become visible.
@@ -98,27 +94,28 @@ public class MainActivity extends Activity {
 
     }
     
+    // The activity is paused
     @Override
     protected void onPause(){
     	super.onPause();
     	Log.v(TAG, "onPause");
     	if (dataUpdateReceiver != null) 
     		unregisterReceiver(dataUpdateReceiver);
-    	//touchBlocker.setVisibility(View.VISIBLE); // touch blocker blocks touches when not within this activity (used for ConnectionPopUp activity)
-    	//mView.unloadLeftToolBar(); // because mView always loads left tool bar at start
     }
+    
+    // The activity is no longer visible (it is now "stopped")
     @Override
     protected void onStop() {
         super.onStop();
         Log.v(TAG, "onStop");
-        // The activity is no longer visible (it is now "stopped")
     }
+    
+    // The activity is about to be destroyed.
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.v(TAG, "onDestroy");
         doUnbindService();
-        // The activity is about to be destroyed.
     }
     
     // Pressing the back button on the android device will perform this function
@@ -139,7 +136,7 @@ public class MainActivity extends Activity {
     }
 
 
-	// Inflate the menu; this adds items to the action bar if it is present.
+	// Adds items to the menu bar (currently used for managing the receive socket)
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    Log.v("TAG", "menu create");
@@ -147,12 +144,13 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	// Called when a menu item is selected
+	// Called when a menu item is selected (starts the socket)
 	public boolean onOptionsItemSelected (MenuItem item){
 		mBoundService.startServer();		
 		return false;
 	}
 	
+	// Called any time the bottom menu pops up
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu){
 	   	 Log.v("TAG", "menu prepare");
@@ -226,7 +224,7 @@ public class MainActivity extends Activity {
 
             	Drawable[] layers = new Drawable[2];
             	
-            	try {
+            	try { // reads json object
 					JSONObject json = new JSONObject(msg);
 					String background = json.getString("background");
 					String foreground = json.getString("foreground");	
@@ -235,43 +233,36 @@ public class MainActivity extends Activity {
 					
 					Log.v(TAG, "Foreground = "+foreground +", Background = "+background);
 					
-					if (foreground.equals("") && background.equals("")){
+					if (foreground.equals("") && background.equals("")){ // if there are no images
 						imageView.setImageDrawable(null);
-					}else if (foreground.equals("")){
+					}else if (foreground.equals("")){ // if only a background image and no foreground image
 						layers[0] = new BitmapDrawable(decodeFile(new File(background_imagePath)));
 						layers[1] = new BitmapDrawable(decodeFile(new File(background_imagePath)));
-					}else{
+					}else{ // if there is both a background image and foreground image
 						layers[0] = new BitmapDrawable(decodeFile(new File(background_imagePath)));
 						layers[1] = new BitmapDrawable(decodeFile(new File(foreground_imagePath)));
 					}
 					
 					if (layers[1] != null && layers[0] != null){
 						LayerDrawable layerDrawable = new LayerDrawable(layers);
-	        	   		imageView.setImageDrawable(layerDrawable);
+	        	   		imageView.setImageDrawable(layerDrawable); // displays layerDrawable in imageView
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
             	
             	
             	// For testing test input 
             	if (msg.equals("1")){
-
             	   	if (mExternalStorageAvailable){
             	   		String imagePath = Environment.getExternalStorageDirectory().toString() + "/DCIM/Test_Screen_1 - Start.png";
             	   		imageView.setImageDrawable(Drawable.createFromPath(imagePath));
             	   	}
-            		
-            		//imageView.setBackgroundColor(Color.RED);
             	}else if (msg.equals("2")){
             	   	if (mExternalStorageAvailable){
             	   		String imagePath = Environment.getExternalStorageDirectory().toString() + "/DCIM/Test_Screen_2 - Start.png";
             	   		imageView.setImageDrawable(Drawable.createFromPath(imagePath));
             	   	}
-            		//imageView.setBackgroundColor(Color.BLUE);
-
-            	
             	}
             	
           }
@@ -302,15 +293,8 @@ public class MainActivity extends Activity {
         } catch (FileNotFoundException e) {}
         return null;
     }
-    
-    public void Connect_Function(View view){
-        //startActivity(new Intent(this, ConnectionPopUp.class));	
-    	Log.v("TAG", "ConnectButton");
-    	mBoundService.startServer();
-    }
-
-    
-
+ 
+    //Checks status of external storage
     private void checkExternalStorage(){
     	String state = Environment.getExternalStorageState();
     	if (Environment.MEDIA_MOUNTED.equals(state)) {

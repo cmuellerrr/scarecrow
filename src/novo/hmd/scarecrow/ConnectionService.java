@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 public class ConnectionService extends Service {
 	
-	/**Connection info*/
+	// Connection info
 	public String ip;
 	private static int port = 5555;
 	
@@ -40,17 +40,21 @@ public class ConnectionService extends Service {
 	private ServerSocket server = null;
 	private Thread       receiveThread = null;
 	private DataInputStream  streamIn  =  null;
+	private Runnable receiveRunnable = null;
 		
 	// Connection status
-	private int status = 0;
-		
-	private Runnable receiveRunnable = null;
+		// 0 = receive socket not started
+		// 1 = receive socket waiting for connection
+		// 2 = receive socket is connected
+	private int status = 0; 
 	
-	// binder for activities to access functions
+	// Binder for activities to access functions
 	private final IBinder myBinder = new LocalBinder();
 	
+	// A string used for debugging purposes
 	private static String TAG = "ConnectionService";
 
+	// Used as spam detection to detect dc's on client side
 	private long lastTime;
 	private int spamCount;	
 	
@@ -59,7 +63,7 @@ public class ConnectionService extends Service {
 		return myBinder;
 	}
 	
-	// these functions can be accessed by activities when the service is bound
+	// These functions can be accessed by activities when the service is bound
     public class LocalBinder extends Binder {
         public ConnectionService getService() {
             return ConnectionService.this;
@@ -76,10 +80,15 @@ public class ConnectionService extends Service {
         }
     }
     
+    // Returns status of connection
+    	// 0 = receive socket not started
+    	// 1 = receive socket waiting for connection
+    	// 2 = receive socket is connected
     public int getConnectionStatus(){
     	return status;
     }
     
+    // Called to start the receive socket
     public void startServer(){
         Log.v(TAG, "startServer");
         
@@ -105,6 +114,8 @@ public class ConnectionService extends Service {
     	receiveThread.start();
     }
     
+    // Called on creation of service
+    	// Creates the server socket
     @Override
     public void onCreate() {
         super.onCreate();
@@ -116,15 +127,16 @@ public class ConnectionService extends Service {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}  
-
         socket = new Socket();
     }
 
+    // Called on start of service
     @Override
     public void onStart(Intent intent, int startId){
         super.onStart(intent, startId);
     }
     
+    // Called when service is destroyed
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -132,14 +144,14 @@ public class ConnectionService extends Service {
         stop();
         socket = null;
     }
-
-	class receiveSocket implements Runnable {
-
+    
+    // receiveSocket thread handles the input stream
+    class receiveSocket implements Runnable {
 		@Override
 		public void run() {
-			try
-	         {  System.out.println("Waiting for a client ..."); 
-	            //Log.v("waiting","waiting");
+			try{  
+				System.out.println("Waiting for a client ..."); 
+	            Log.v("waiting","waiting");
 	            status = 1;
 	         	socket = server.accept();
 	            System.out.println("Client accepted: " + socket);
@@ -155,7 +167,6 @@ public class ConnectionService extends Service {
 		              Log.v("waiting  for msg",""+spamCount);
 		              checkDisconnectSpam();
 		              
-		            
 	            	  String line = streamIn.readLine();
 	            	  if (line!=null){ 
 	            		  Log.v("SERVER",line);
@@ -164,30 +175,19 @@ public class ConnectionService extends Service {
 	            	  }
 	               }
 	               catch(IOException ioe)
-	               {  done = true;
-	               status = 0;}
+	               {  
+	            	   done = true;
+	            	   status = 0;
+	               }
 	            }
 	            close();
 	         }
 	         catch(IOException ie)
-	         {  status = 0;
-	         System.out.println("Acceptance Error: " + ie);  }
-	      }
-			
-		/*
-		public void start()
-		{  if (thread == null)
-		   {  thread = new Thread(this); 
-		      thread.start();
-		   }
-		}
-		public void stop()
-		{  if (thread != null)
-		   {  thread.stop(); 
-		      thread = null;
-		   }
-		}*/
-		
+	         {  
+	        	 status = 0;
+	        	 System.out.println("Acceptance Error: " + ie);  
+	         }
+	      }		
 	}
 
 	// Closes the socket if a ton of messages are sent
@@ -204,10 +204,13 @@ public class ConnectionService extends Service {
 		}
 	}
 	
+	// opens input stream
 	public void open() throws IOException
-	{  streamIn = new DataInputStream(new 
-	                     BufferedInputStream(socket.getInputStream()));
+	{  
+		streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 	}
+	
+	// closes socket and input stream
 	public void close() throws IOException
 	{ 
 		status = 0;
@@ -222,7 +225,6 @@ public class ConnectionService extends Service {
 
 	    try {
 	    	if (socket!= null) socket.close();
-	    	//if (streamOut != null) streamOut.close();
 	    	if (streamIn != null) streamIn.close();
 	    } catch (IOException e) {
 			e.printStackTrace();
