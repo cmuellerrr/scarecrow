@@ -35,7 +35,7 @@ public class ConnectionService extends Service {
 	
 	// Connection info
 	public String ip;
-	private static int port = 5552;
+	private static int port = 5555;
 	
 	// Socket stuff
 	Socket socket;
