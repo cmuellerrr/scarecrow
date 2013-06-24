@@ -18,6 +18,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
+
 import org.apache.http.util.ByteArrayBuffer;
 import android.app.Service;
 import android.content.Intent;
@@ -33,7 +35,7 @@ public class ConnectionService extends Service {
 	
 	// Connection info
 	public String ip;
-	private static int port = 5555;
+	private static int port = 5552;
 	
 	// Socket stuff
 	Socket socket;
@@ -102,13 +104,21 @@ public class ConnectionService extends Service {
 			e.printStackTrace();
 	    }
     	
-        try {
-			server = new ServerSocket(port);
+    	try {
+			server = new ServerSocket();
+        	server.setReuseAddress(true);
+        	server.bind(new InetSocketAddress(port));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  
-        
-    	socket = new Socket();
+    	try {
+        	socket = new Socket();
+			socket.setReuseAddress(true);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     	receiveRunnable = new receiveSocket();
     	receiveThread = new Thread(receiveRunnable);
     	receiveThread.start();
@@ -120,7 +130,7 @@ public class ConnectionService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.v(TAG, "onCreate");
-        
+    /*    
         try {
 			server = new ServerSocket(port);
 		} catch (IOException e) {
@@ -128,6 +138,7 @@ public class ConnectionService extends Service {
 			e.printStackTrace();
 		}  
         socket = new Socket();
+    */
     }
 
     // Called on start of service
