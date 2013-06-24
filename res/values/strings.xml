@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<!-- Control Panel -->
-	<string name="app_name">Control Panel V1</string>
+	<string name="app_name">Scarecrow</string>
     <string name="Frequency">Frequency</string>
     <string name="Contrast">Contrast</string>
     <string name="LineDensity">Line Density</string>
