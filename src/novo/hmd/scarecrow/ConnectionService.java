@@ -103,7 +103,7 @@ public class ConnectionService extends Service {
 	    } catch (IOException e) {
 			e.printStackTrace();
 	    }
-    	
+    	 
     	try {
 			server = new ServerSocket();
         	server.setReuseAddress(true);
