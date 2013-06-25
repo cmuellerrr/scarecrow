@@ -1,34 +1,18 @@
 package novo.hmd.scarecrow;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 
-import org.apache.http.util.ByteArrayBuffer;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 
 public class ConnectionService extends Service {
